@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BBCC1E1A-4140-4C9E-AE15-3FD7FBD17F33}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Domain</RootNamespace>
+    <AssemblyName>Domain</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  <TargetFrameworks>net35;net472</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\Constants\ApiConstant.cs" />
+    <Compile Include="Entities\Constants\EnvironmentConfiguration.cs" />
+    <Compile Include="Entities\Constants\EnvironmentQAction.cs" />
+    <Compile Include="Entities\Constants\EnvironmentTCAction.cs" />
+    <Compile Include="Entities\Constants\InputAction.cs" />
+    <Compile Include="Entities\Constants\OutputAction.cs" />
+    <Compile Include="Entities\Constants\ProcessName.cs" />
+    <Compile Include="Entities\Constants\SolutionSummaryKeyword.cs" />
+    <Compile Include="Entities\Docker\DockerBase.cs" />
+    <Compile Include="Entities\Enum\DatabaseManagementSystem.cs" />
+    <Compile Include="Entities\Enum\EnvironmentType.cs" />
+    <Compile Include="Entities\Enum\Status.cs" />
+    <Compile Include="Entities\Main\Environment.cs" />
+    <Compile Include="Entities\Main\Question\HeaderQ.cs" />
+    <Compile Include="Entities\Main\Question\QuestionKit.cs" />
+    <Compile Include="Entities\Main\Question\StudentQuestion.cs" />
+    <Compile Include="Entities\Main\Student.cs" />
+    <Compile Include="Entities\Main\TestCase\BrowserConfigs.cs" />
+    <Compile Include="Entities\Main\TestCase\Config.cs" />
+    <Compile Include="Entities\Main\TestCase\InputStep.cs" />
+    <Compile Include="Entities\Main\TestCase\OutputDBAction.cs" />
+    <Compile Include="Entities\Main\TestCase\OutputUIAction.cs" />
+    <Compile Include="Entities\Main\TestCase\Testcase.cs" />
+    <Compile Include="Entities\Main\TestCase\TestcaseKit.cs" />
+    <Compile Include="Entities\Main\TestCase\TestcaseStage.cs" />
+    <Compile Include="Entities\Pcap\HttpPacketInfo.cs" />
+    <Compile Include="Entities\Pcap\RequestResponseLog.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
