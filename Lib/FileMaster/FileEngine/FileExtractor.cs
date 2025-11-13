@@ -1,16 +1,13 @@
 ﻿using EnvironmentBuilder.CommandSupporter;
 using Ionic.Zip;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace FileMaster.FileEngine
 {
     public class FileExtractor
     {
+        // Uses Ionic.Zip to extract zip files. Removes COM Shell32 usage which requires a Windows-only COM reference.
         public static void Unzip(string sourceFile, string destination)
         {
             if (string.IsNullOrEmpty(sourceFile))
@@ -23,13 +20,8 @@ namespace FileMaster.FileEngine
             {
                 zips.ExtractAll(destination);
             }
-            // Use the IShellDispatch interface instead of ShellClass to avoid CS1752
-            Shell32.IShellDispatch sc = (Shell32.IShellDispatch)new Shell32.Shell();
-            Shell32.Folder SrcFlder = sc.NameSpace(sourceFile);
-            Shell32.Folder DestFlder = sc.NameSpace(destination);
-            Shell32.FolderItems items = SrcFlder.Items();
-            DestFlder.CopyHere(items, 20);
         }
+
         public static void ExtractDestination(string zipPath, string destinationPath)
         {
             if (destinationPath == null)
@@ -43,6 +35,5 @@ namespace FileMaster.FileEngine
             }
             Console.WriteLine($"Extracted {zipPath} to {destinationPath}");
         }
-
     }
 }
