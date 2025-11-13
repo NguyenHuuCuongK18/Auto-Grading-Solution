@@ -23,7 +23,8 @@ namespace FileMaster.FileEngine
             {
                 zips.ExtractAll(destination);
             }
-            Shell32.ShellClass sc = new Shell32.ShellClass();
+            // Use the IShellDispatch interface instead of ShellClass to avoid CS1752
+            Shell32.IShellDispatch sc = (Shell32.IShellDispatch)new Shell32.Shell();
             Shell32.Folder SrcFlder = sc.NameSpace(sourceFile);
             Shell32.Folder DestFlder = sc.NameSpace(destination);
             Shell32.FolderItems items = SrcFlder.Items();
