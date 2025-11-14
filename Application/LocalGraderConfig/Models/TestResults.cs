@@ -144,24 +144,39 @@ namespace LocalGraderConfig.Models
     public class SuiteGradingResult
     {
         /// <summary>
+        /// Suite name
+        /// </summary>
+        public string SuiteName { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// Whether grading completed successfully
+        /// </summary>
+        public bool Success { get; set; }
+        
+        /// <summary>
+        /// Error message if failed
+        /// </summary>
+        public string? ErrorMessage { get; set; }
+        
+        /// <summary>
         /// Total marks possible across all test cases
         /// </summary>
-        public double TotalMaxMarks { get; set; }
+        public double TotalMarks { get; set; }
         
         /// <summary>
         /// Total marks earned
         /// </summary>
-        public double TotalEarnedMarks { get; set; }
+        public double EarnedMarks { get; set; }
         
         /// <summary>
         /// Percentage score
         /// </summary>
-        public double PercentageScore => TotalMaxMarks > 0 ? (TotalEarnedMarks / TotalMaxMarks) * 100 : 0;
+        public double PercentageScore => TotalMarks > 0 ? (EarnedMarks / TotalMarks) * 100 : 0;
         
         /// <summary>
         /// Results for each test case
         /// </summary>
-        public List<TestCaseResult> TestCaseResults { get; set; } = new();
+        public List<TestCaseGradingResult> TestCaseResults { get; set; } = new();
         
         /// <summary>
         /// Critical errors that stopped grading
@@ -177,5 +192,41 @@ namespace LocalGraderConfig.Models
         /// Timestamp when grading completed
         /// </summary>
         public DateTime EndTime { get; set; }
+    }
+    
+    /// <summary>
+    /// Results from grading a single test case
+    /// </summary>
+    public class TestCaseGradingResult
+    {
+        /// <summary>
+        /// Test case ID
+        /// </summary>
+        public string TestCaseId { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// Total marks possible
+        /// </summary>
+        public double TotalMarks { get; set; }
+        
+        /// <summary>
+        /// Marks earned
+        /// </summary>
+        public double EarnedMarks { get; set; }
+        
+        /// <summary>
+        /// Whether test case passed
+        /// </summary>
+        public bool Success { get; set; }
+        
+        /// <summary>
+        /// Error message if failed
+        /// </summary>
+        public string? ErrorMessage { get; set; }
+        
+        /// <summary>
+        /// Stage results
+        /// </summary>
+        public List<StageResult> StageResults { get; set; } = new();
     }
 }

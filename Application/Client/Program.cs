@@ -1,11 +1,13 @@
-using GraderCore.Models;
-using GraderCore.Services;
+using LocalGraderConfig.Models;
+using GraderCore.Services; // Temporary - will be removed in Phase 2
+using SingleStudentGrade;
 
 namespace AutoGradingClient
 {
     /// <summary>
     /// Command-line interface for the auto-grading system
     /// Usage: Client ExecuteSuite --suite <path> --out <path> [options]
+    /// Uses modular architecture with ProcessLauncher pattern
     /// </summary>
     public class Program
     {
@@ -97,23 +99,26 @@ namespace AutoGradingClient
             Console.WriteLine($"Results will be saved to: {timestampedResultRoot}");
             Console.WriteLine();
             
-            // Create services
-            var suiteLoader = new SuiteLoader();
-            var testCaseParser = new TestCaseParser();
-            var loggingService = new LoggingService();
+            // ===================================================================
+            // NEW: Use modular architecture with ProcessLauncher pattern
+            // GradingOrchestrator delegates to specialized services
+            // ===================================================================
+            Console.WriteLine("Using modular architecture (Phase 1 complete)");
+            Console.WriteLine("ProcessLauncher pattern: Service orchestration");
+            Console.WriteLine();
             
-            var runner = new SuiteRunner(suiteLoader, testCaseParser, loggingService);
+            var orchestrator = new GradingOrchestrator(timestampedResultRoot);
             
-            // Execute suite
-            var result = runner.ExecuteSuite(executeArgs);
+            // Execute suite using new modular architecture
+            var result = orchestrator.ExecuteGrading(executeArgs);
             
-            // Return exit code: 0 if all passed, 1 if any failed
-            if (result.CriticalErrors.Count > 0)
+            // Return exit code
+            if (!result.Success)
             {
                 return -1; // Critical error
             }
             
-            return result.TestCaseResults.All(tc => tc.Passed) ? 0 : 1;
+            return result.EarnedMarks >= result.TotalMarks * 0.5 ? 0 : 1;
         }
         
         /// <summary>

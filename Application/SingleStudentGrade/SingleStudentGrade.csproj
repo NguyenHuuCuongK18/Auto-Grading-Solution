@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +17,7 @@
     <ProjectReference Include="..\LocalGraderConfig\LocalGraderConfig.csproj" />
     <ProjectReference Include="..\NetworkingMiddleware\NetworkingMiddleware.csproj" />
     <ProjectReference Include="..\ProcessLauncher\ProcessLauncher.csproj" />
+    <ProjectReference Include="..\GraderCore\GraderCore.csproj" />
   </ItemGroup>
 
 </Project>
