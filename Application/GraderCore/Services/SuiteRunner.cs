@@ -62,7 +62,9 @@ namespace GraderCore.Services
                 var databaseScript = args.DatabaseScriptPath;
                 if (string.IsNullOrEmpty(databaseScript) && !string.IsNullOrEmpty(suite.Environment.DefaultDatabaseFilePath))
                 {
-                    databaseScript = Path.Combine(args.SuitePath, suite.Environment.DefaultDatabaseFilePath);
+                    // Normalize path separators (Excel may have Windows paths)
+                    var normalizedPath = suite.Environment.DefaultDatabaseFilePath.Replace('\\', Path.DirectorySeparatorChar);
+                    databaseScript = Path.Combine(args.SuitePath, normalizedPath);
                 }
                 
                 // Build connection string

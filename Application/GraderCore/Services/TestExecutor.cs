@@ -62,10 +62,10 @@ namespace GraderCore.Services
                     _loggingService.LogProcess("Resetting database...");
                     if (!_databaseService.ResetDatabase(databaseScript, connectionString))
                     {
-                        result.Errors.Add("Database reset failed");
-                        result.Passed = false;
-                        result.EarnedMarks = 0;
-                        return result;
+                        // Database reset failed - log as warning but continue
+                        // (SQL Server may not be available in all environments)
+                        _loggingService.LogProcess("Database reset failed - continuing without database reset", "WARN");
+                        result.Errors.Add("Database reset failed (non-critical)");
                     }
                 }
                 
