@@ -199,6 +199,23 @@ Client ExecuteSuite --suite ./MyTestCases/Testkit_HTTP_1 --out ./Results \
   --client ./student/Client.exe --timeout 60
 ```
 
+### Meta/Given Folder
+
+The `Meta/Given/` folder in each test kit should contain reference/standard client and server executables:
+
+```
+TestSuite/Meta/Given/
+  Client.exe    - Reference client executable
+  Server.exe    - Reference server executable
+```
+
+**Purpose**: When `Grade_Content` in test case header.xlsx specifies:
+- `"Client"` - Grade student's client using standard server from Meta/Given
+- `"Server"` - Grade student's server using standard client from Meta/Given  
+- `"Both"` - Grade both student's client and server
+
+**Status**: ⚠️ The Meta/Given folders exist but are currently empty. To test the grading system with a happy case, copy reference executables to `Meta/Given/` before running. See `Meta/Given/README.md` in each test kit for details.
+
 ## Output
 
 Results are saved in a timestamped folder: `GradeResult_YYYYMMDD_HHMMSS/`
@@ -343,6 +360,13 @@ Implement `IComparisonService` interface for custom comparison logic.
 4. **No Docker Support**: Unlike the original test-grader, this runs locally
    - No container isolation
    - Processes run on host machine
+
+5. **Testing Status**: ⚠️ Not yet tested with actual client/server executables
+   - Test kit parsing: ✅ Verified
+   - Report generation: ✅ Verified
+   - Process management: ✅ Implemented but not tested end-to-end
+   - **Happy case testing**: ❌ Requires reference executables in Meta/Given folders
+   - To test: Copy working client/server executables to `Meta/Given/` folders in test kits
 
 ## Development
 
