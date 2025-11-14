@@ -34,8 +34,6 @@ namespace GraderCore.Services
                     
                     var startInfo = new ProcessStartInfo
                     {
-                        FileName = exePath,
-                        Arguments = arguments ?? string.Empty,
                         WorkingDirectory = workingDirectory,
                         UseShellExecute = false,
                         RedirectStandardInput = true,
@@ -43,6 +41,20 @@ namespace GraderCore.Services
                         RedirectStandardError = true,
                         CreateNoWindow = true
                     };
+                    
+                    // Support both .exe and .dll execution
+                    if (exePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Use dotnet to run DLL
+                        startInfo.FileName = "dotnet";
+                        startInfo.Arguments = $"\"{exePath}\" {arguments ?? string.Empty}";
+                    }
+                    else
+                    {
+                        // Direct execution for .exe
+                        startInfo.FileName = exePath;
+                        startInfo.Arguments = arguments ?? string.Empty;
+                    }
                     
                     managed.Process = new Process { StartInfo = startInfo };
                     
