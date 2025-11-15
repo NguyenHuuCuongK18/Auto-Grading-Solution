@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LocalLog\LocalLog.csproj" />
+    <ProjectReference Include="..\LocalDatabase\LocalDatabase.csproj" />
+    <ProjectReference Include="..\LocalGrade\LocalGrade.csproj" />
+    <ProjectReference Include="..\LocalGraderConfig\LocalGraderConfig.csproj" />
+    <ProjectReference Include="..\NetworkingMiddleware\NetworkingMiddleware.csproj" />
+    <ProjectReference Include="..\ProcessLauncher\ProcessLauncher.csproj" />
+    <ProjectReference Include="..\GraderCore\GraderCore.csproj" />
+  </ItemGroup>
+
+</Project>
