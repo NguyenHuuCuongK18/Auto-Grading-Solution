@@ -42,16 +42,8 @@ namespace GraderCore.Services
         {
             Directory.CreateDirectory(outputPath);
             
-            // Write process log
-            var processLogPath = Path.Combine(outputPath, FileKeywords.LogFile_GradeProcess);
-            File.WriteAllText(processLogPath, _processLog.ToString());
-            LogProcess($"Process log saved to: {processLogPath}");
-            
-            // Generate Excel results
+            // Generate Excel results (includes process log and summary)
             GenerateExcelResults(suiteResult, outputPath);
-            
-            // Generate summary text file
-            GenerateSummary(suiteResult, outputPath);
         }
         
         /// <summary>
@@ -63,37 +55,11 @@ namespace GraderCore.Services
             
             using var workbook = new XLWorkbook();
             
+            // Process Log sheet
+            CreateProcessLogSheet(workbook);
+            
             // Summary sheet
-            var summarySheet = workbook.Worksheets.Add("Summary");
-            summarySheet.Cell(1, 1).Value = "Test Case";
-            summarySheet.Cell(1, 2).Value = "Max Marks";
-            summarySheet.Cell(1, 3).Value = "Earned Marks";
-            summarySheet.Cell(1, 4).Value = "Passed";
-            summarySheet.Cell(1, 5).Value = "Summary";
-            
-            int row = 2;
-            foreach (var tcResult in suiteResult.TestCaseResults)
-            {
-                summarySheet.Cell(row, 1).Value = tcResult.TestCaseId;
-                summarySheet.Cell(row, 2).Value = tcResult.MaxMarks;
-                summarySheet.Cell(row, 3).Value = tcResult.EarnedMarks;
-                summarySheet.Cell(row, 4).Value = tcResult.Passed ? "PASS" : "FAIL";
-                summarySheet.Cell(row, 5).Value = tcResult.Summary;
-                row++;
-            }
-            
-            // Total row
-            summarySheet.Cell(row, 1).Value = "TOTAL";
-            summarySheet.Cell(row, 2).Value = suiteResult.TotalMaxMarks;
-            summarySheet.Cell(row, 3).Value = suiteResult.TotalEarnedMarks;
-            summarySheet.Cell(row, 4).Value = $"{suiteResult.PercentageScore:F2}%";
-            
-            // Format header
-            var headerRange = summarySheet.Range(1, 1, 1, 5);
-            headerRange.Style.Font.Bold = true;
-            headerRange.Style.Fill.BackgroundColor = XLColor.LightBlue;
-            
-            summarySheet.Columns().AdjustToContents();
+            CreateSummarySheet(workbook, suiteResult);
             
             // Detailed sheets for each test case
             foreach (var tcResult in suiteResult.TestCaseResults)
@@ -106,6 +72,144 @@ namespace GraderCore.Services
             
             workbook.SaveAs(excelPath);
             LogProcess($"Results Excel saved to: {excelPath}");
+        }
+        
+        /// <summary>
+        /// Creates the process log sheet with all logged messages
+        /// </summary>
+        private void CreateProcessLogSheet(XLWorkbook workbook)
+        {
+            var sheet = workbook.Worksheets.Add("ProcessLog");
+            
+            sheet.Cell(1, 1).Value = "Timestamp";
+            sheet.Cell(1, 2).Value = "Level";
+            sheet.Cell(1, 3).Value = "Message";
+            
+            // Format header
+            var headerRange = sheet.Range(1, 1, 1, 3);
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+            
+            // Parse log entries
+            var logLines = _processLog.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            int row = 2;
+            
+            foreach (var line in logLines)
+            {
+                // Parse log format: [timestamp] [level] message
+                var match = System.Text.RegularExpressions.Regex.Match(line, @"^\[(.*?)\] \[(.*?)\] (.*)$");
+                if (match.Success)
+                {
+                    sheet.Cell(row, 1).Value = match.Groups[1].Value;
+                    sheet.Cell(row, 2).Value = match.Groups[2].Value;
+                    sheet.Cell(row, 3).Value = match.Groups[3].Value;
+                    
+                    // Color code by level
+                    var level = match.Groups[2].Value;
+                    if (level == "ERROR")
+                    {
+                        sheet.Row(row).Style.Fill.BackgroundColor = XLColor.LightPink;
+                    }
+                    else if (level == "WARN")
+                    {
+                        sheet.Row(row).Style.Fill.BackgroundColor = XLColor.LightYellow;
+                    }
+                }
+                else
+                {
+                    // Line doesn't match expected format, put in message column
+                    sheet.Cell(row, 3).Value = line;
+                }
+                row++;
+            }
+            
+            sheet.Columns().AdjustToContents();
+        }
+        
+        /// <summary>
+        /// Creates the summary sheet with overall test results
+        /// </summary>
+        private void CreateSummarySheet(XLWorkbook workbook, SuiteGradingResult suiteResult)
+        {
+            var summarySheet = workbook.Worksheets.Add("Summary");
+            
+            // Add header information
+            summarySheet.Cell(1, 1).Value = "AUTO-GRADING RESULTS";
+            summarySheet.Cell(1, 1).Style.Font.Bold = true;
+            summarySheet.Cell(1, 1).Style.Font.FontSize = 14;
+            summarySheet.Range(1, 1, 1, 5).Merge();
+            
+            summarySheet.Cell(2, 1).Value = "Start Time:";
+            summarySheet.Cell(2, 2).Value = suiteResult.StartTime.ToString("yyyy-MM-dd HH:mm:ss");
+            summarySheet.Cell(3, 1).Value = "End Time:";
+            summarySheet.Cell(3, 2).Value = suiteResult.EndTime.ToString("yyyy-MM-dd HH:mm:ss");
+            summarySheet.Cell(4, 1).Value = "Duration:";
+            summarySheet.Cell(4, 2).Value = $"{(suiteResult.EndTime - suiteResult.StartTime).TotalSeconds:F2} seconds";
+            summarySheet.Cell(5, 1).Value = "Total Score:";
+            summarySheet.Cell(5, 2).Value = $"{suiteResult.TotalEarnedMarks:F2} / {suiteResult.TotalMaxMarks:F2} ({suiteResult.PercentageScore:F2}%)";
+            summarySheet.Cell(5, 2).Style.Font.Bold = true;
+            
+            // Test case results table
+            int row = 7;
+            summarySheet.Cell(row, 1).Value = "Test Case";
+            summarySheet.Cell(row, 2).Value = "Max Marks";
+            summarySheet.Cell(row, 3).Value = "Earned Marks";
+            summarySheet.Cell(row, 4).Value = "Passed";
+            summarySheet.Cell(row, 5).Value = "Summary";
+            
+            // Format table header
+            var tableHeaderRange = summarySheet.Range(row, 1, row, 5);
+            tableHeaderRange.Style.Font.Bold = true;
+            tableHeaderRange.Style.Fill.BackgroundColor = XLColor.LightBlue;
+            
+            row++;
+            foreach (var tcResult in suiteResult.TestCaseResults)
+            {
+                summarySheet.Cell(row, 1).Value = tcResult.TestCaseId;
+                summarySheet.Cell(row, 2).Value = tcResult.MaxMarks;
+                summarySheet.Cell(row, 3).Value = tcResult.EarnedMarks;
+                summarySheet.Cell(row, 4).Value = tcResult.Passed ? "PASS" : "FAIL";
+                summarySheet.Cell(row, 5).Value = tcResult.Summary;
+                
+                // Color code PASS/FAIL
+                if (tcResult.Passed)
+                {
+                    summarySheet.Cell(row, 4).Style.Fill.BackgroundColor = XLColor.LightGreen;
+                }
+                else
+                {
+                    summarySheet.Cell(row, 4).Style.Fill.BackgroundColor = XLColor.LightPink;
+                }
+                row++;
+            }
+            
+            // Total row
+            summarySheet.Cell(row, 1).Value = "TOTAL";
+            summarySheet.Cell(row, 1).Style.Font.Bold = true;
+            summarySheet.Cell(row, 2).Value = suiteResult.TotalMaxMarks;
+            summarySheet.Cell(row, 3).Value = suiteResult.TotalEarnedMarks;
+            summarySheet.Cell(row, 4).Value = $"{suiteResult.PercentageScore:F2}%";
+            summarySheet.Cell(row, 4).Style.Font.Bold = true;
+            
+            // Add critical errors if any
+            if (suiteResult.CriticalErrors.Count > 0)
+            {
+                row += 2;
+                summarySheet.Cell(row, 1).Value = "CRITICAL ERRORS:";
+                summarySheet.Cell(row, 1).Style.Font.Bold = true;
+                summarySheet.Cell(row, 1).Style.Fill.BackgroundColor = XLColor.Red;
+                summarySheet.Cell(row, 1).Style.Font.FontColor = XLColor.White;
+                row++;
+                
+                foreach (var error in suiteResult.CriticalErrors)
+                {
+                    summarySheet.Cell(row, 1).Value = error;
+                    summarySheet.Range(row, 1, row, 5).Merge();
+                    row++;
+                }
+            }
+            
+            summarySheet.Columns().AdjustToContents();
         }
         
         /// <summary>
@@ -148,55 +252,6 @@ namespace GraderCore.Services
             headerRange.Style.Fill.BackgroundColor = XLColor.LightGreen;
             
             sheet.Columns().AdjustToContents();
-        }
-        
-        /// <summary>
-        /// Generates a text summary file
-        /// </summary>
-        private void GenerateSummary(SuiteGradingResult suiteResult, string outputPath)
-        {
-            var summaryPath = Path.Combine(outputPath, "Summary.txt");
-            var sb = new StringBuilder();
-            
-            sb.AppendLine("=================================");
-            sb.AppendLine("   AUTO-GRADING RESULTS");
-            sb.AppendLine("=================================");
-            sb.AppendLine();
-            sb.AppendLine($"Start Time: {suiteResult.StartTime:yyyy-MM-dd HH:mm:ss}");
-            sb.AppendLine($"End Time: {suiteResult.EndTime:yyyy-MM-dd HH:mm:ss}");
-            sb.AppendLine($"Duration: {(suiteResult.EndTime - suiteResult.StartTime).TotalSeconds:F2} seconds");
-            sb.AppendLine();
-            sb.AppendLine($"Total Score: {suiteResult.TotalEarnedMarks:F2} / {suiteResult.TotalMaxMarks:F2} ({suiteResult.PercentageScore:F2}%)");
-            sb.AppendLine();
-            sb.AppendLine("Test Case Results:");
-            sb.AppendLine("----------------------------------");
-            
-            foreach (var tcResult in suiteResult.TestCaseResults)
-            {
-                var status = tcResult.Passed ? "PASS" : "FAIL";
-                sb.AppendLine($"  [{status}] {tcResult.TestCaseId}: {tcResult.EarnedMarks:F2}/{tcResult.MaxMarks:F2}");
-                if (!string.IsNullOrEmpty(tcResult.Summary))
-                {
-                    sb.AppendLine($"        {tcResult.Summary}");
-                }
-            }
-            
-            if (suiteResult.CriticalErrors.Count > 0)
-            {
-                sb.AppendLine();
-                sb.AppendLine("CRITICAL ERRORS:");
-                sb.AppendLine("----------------------------------");
-                foreach (var error in suiteResult.CriticalErrors)
-                {
-                    sb.AppendLine($"  - {error}");
-                }
-            }
-            
-            sb.AppendLine();
-            sb.AppendLine("=================================");
-            
-            File.WriteAllText(summaryPath, sb.ToString());
-            LogProcess($"Summary saved to: {summaryPath}");
         }
     }
 }

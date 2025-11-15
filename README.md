@@ -222,24 +222,43 @@ Results are saved in a timestamped folder: `GradeResult_YYYYMMDD_HHMMSS/`
 
 ### Generated Files
 
-1. **GradeProcess.log**: Detailed log of the grading process including:
-   - Test case execution steps
-   - Process start/stop events
-   - Validation results
-   - Errors and warnings
-
-2. **GradeResults.xlsx**: Excel file with:
-   - **Summary** sheet: Overall results for each test case
+1. **GradeResults.xlsx**: Comprehensive Excel file with multiple sheets:
+   - **ProcessLog** sheet: Detailed log of the grading process including:
+     - Timestamped log entries with severity levels (INFO, WARN, ERROR)
+     - Test case execution steps
+     - Process start/stop events
+     - Validation results
+     - Errors and warnings
+   
+   - **Summary** sheet: Overall results with:
+     - Execution metadata (start time, end time, duration)
+     - Total score and percentage
+     - Per-test-case results table
+     - Critical errors (if any)
+   
    - **TC01_**, **TC02_**, etc. sheets: Detailed stage-by-stage results showing expected vs actual data
-
-3. **Summary.txt**: Plain text summary of results
 
 ### Example GradeResults.xlsx Structure
 
+**ProcessLog Sheet:**
+
+| Timestamp | Level | Message |
+|-----------|-------|---------|
+| 2024-01-01 10:00:00.123 | INFO | Loading test suite from: ./TestSuite |
+| 2024-01-01 10:00:01.456 | INFO | Starting test case TC01_Start |
+| 2024-01-01 10:00:05.789 | ERROR | Client process failed to start |
+
 **Summary Sheet:**
 
-| Test Case | Max Marks | Earned Marks | Passed | Summary |
+| | | | | |
 |-----------|-----------|--------------|--------|---------|
+| **AUTO-GRADING RESULTS** | | | | |
+| Start Time: | 2024-01-01 10:00:00 | | | |
+| End Time: | 2024-01-01 10:05:30 | | | |
+| Duration: | 330.00 seconds | | | |
+| Total Score: | 3.5 / 6.0 (58.33%) | | | |
+| | | | | |
+| **Test Case** | **Max Marks** | **Earned Marks** | **Passed** | **Summary** |
 | TC01_Start | 1.0 | 1.0 | PASS | Passed 2/2 stages |
 | TC02_SendData | 5.0 | 2.5 | FAIL | Passed 2/4 stages |
 | TOTAL | 6.0 | 3.5 | 58.33% | |
