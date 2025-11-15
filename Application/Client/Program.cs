@@ -192,7 +192,7 @@ NOTES:
   - Test suite structure is read from header.xlsx and environment.xlsx
   - Database reset is automatic if database script is available
   - Results are saved in timestamped folders (GradeResult_YYYYMMDD_HHMMSS)
-  - Detailed logs are generated: GradeProcess.log and GradeResults.xlsx
+  - All logs and results are in Excel format: GradeResults.xlsx
   - Network traffic capture requires middleware (currently stub implementation)
 
 For more information, see README.md

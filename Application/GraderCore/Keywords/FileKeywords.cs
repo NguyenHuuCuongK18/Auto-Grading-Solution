@@ -18,7 +18,6 @@ namespace GraderCore.Keywords
         public const string Pattern_GradeResult = "GradeResult_{0}";
         
         // Log file names
-        public const string LogFile_GradeProcess = "GradeProcess.log";
         public const string LogFile_GradeResults = "GradeResults.xlsx";
         
         // Meta folder
